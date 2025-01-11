@@ -1,0 +1,24 @@
+{
+  "name": "back-users-crud",
+  "version": "1.0.0",
+  "description": "Backend para crear usuarios con JWT y MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9",
+    "swagger-jsdoc": "^6.0.0",
+    "swagger-ui-express": "^4.1.6",
+    "cors": "^2.8.5",
+    "helmet": "^4.6.0",
+    "dotenv": "^10.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
