@@ -55,11 +55,14 @@ const router = express.Router();
  */
 router.post('/', async (req, res) => {
   try {
+    console.log('Solicitud para crear un nuevo usuario:', req.body);
     const { username, email, password, firstName, lastName, address, phone } = req.body;
     const user = new User({ username, email, password, firstName, lastName, address, phone });
     await user.save();
+    console.log('Usuario creado exitosamente:', user);
     res.status(201).send({ message: 'Usuario creado exitosamente' });
   } catch (error) {
+    console.error('Error al crear el usuario:', error);
     res.status(400).send({ error: error.message });
   }
 });

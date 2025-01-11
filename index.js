@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const helmet = require("helmet");
+const morgan = require("morgan");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const userRoutes = require("./routes/userRoutes");
@@ -12,8 +13,18 @@ const app = express();
 const port = 3000;
 
 // Middleware
-app.use(bodyParser.json());
-app.use(cors());
+app.use(morgan('combined')); // Registrar solicitudes HTTP
+app.use(bodyParser.json({ limit: '10mb' }));
+
+// Configuración de CORS
+const corsOptions = {
+  origin: '*', // Permitir todas las fuentes, puedes cambiar esto a una lista específica de dominios
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+app.use(cors(corsOptions));
+
 app.use(helmet());
 
 // MongoDB connection
@@ -21,6 +32,7 @@ mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true
   })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
@@ -43,6 +55,16 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use("/api/users", userRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Registrar el stack trace del error
+  if (err.type === 'entity.parse.failed') {
+    res.status(400).send({ error: 'Bad Request: Invalid JSON' });
+  } else {
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
