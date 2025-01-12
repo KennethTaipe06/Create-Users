@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true
+  },
+  image: {
+    data: Buffer,
+    contentType: String
   }
 });
 

@@ -1,8 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
 const User = require('../models/User');
 
 const router = express.Router();
+
+// Configuración de multer para la carga de archivos en memoria
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 /**
  * @swagger
@@ -33,6 +38,9 @@ const router = express.Router();
  *           type: string
  *         phone:
  *           type: string
+ *         image:
+ *           type: string
+ *           format: binary
  */
 
 /**
@@ -44,20 +52,40 @@ const router = express.Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
  *       400:
  *         description: Error en la solicitud
  */
-router.post('/', async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
   try {
     console.log('Solicitud para crear un nuevo usuario:', req.body);
     const { username, email, password, firstName, lastName, address, phone } = req.body;
-    const user = new User({ username, email, password, firstName, lastName, address, phone });
+    const image = req.file ? { data: req.file.buffer, contentType: req.file.mimetype } : null;
+    console.log('Datos de la imagen:', image);
+    const user = new User({ username, email, password, firstName, lastName, address, phone, image });
     await user.save();
     console.log('Usuario creado exitosamente:', user);
     res.status(201).send({ message: 'Usuario creado exitosamente' });

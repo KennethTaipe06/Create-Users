@@ -58,7 +58,8 @@ app.use("/api/users", userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Registrar el stack trace del error
+  console.error('Error:', err.message); // Registrar el mensaje del error
+  console.error('Stack:', err.stack); // Registrar el stack trace del error
   if (err.type === 'entity.parse.failed') {
     res.status(400).send({ error: 'Bad Request: Invalid JSON' });
   } else {
