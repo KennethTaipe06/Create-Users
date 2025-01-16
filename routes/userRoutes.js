@@ -1,11 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
 
 const router = express.Router();
 
-// Configuración de multer para la carga de archivos en memoria
+// Multer configuration for in-memory file storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -23,6 +25,10 @@ const upload = multer({ storage: storage });
  *         - lastName
  *         - address
  *         - phone
+ *         - semester
+ *         - parallel
+ *         - career
+ *         - description
  *       properties:
  *         username:
  *           type: string
@@ -41,13 +47,21 @@ const upload = multer({ storage: storage });
  *         image:
  *           type: string
  *           format: binary
+ *         semester:
+ *           type: string
+ *         parallel:
+ *           type: string
+ *         career:
+ *           type: string
+ *         description:
+ *           type: string
  */
 
 /**
  * @swagger
  * /api/users:
  *   post:
- *     summary: Crear un nuevo usuario
+ *     summary: Create a new user
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -73,24 +87,39 @@ const upload = multer({ storage: storage });
  *               image:
  *                 type: string
  *                 format: binary
+ *               semester:
+ *                 type: string
+ *               parallel:
+ *                 type: string
+ *               career:
+ *                 type: string
+ *               description:
+ *                 type: string
  *     responses:
  *       201:
- *         description: Usuario creado exitosamente
+ *         description: User created successfully
  *       400:
- *         description: Error en la solicitud
+ *         description: Bad request
  */
 router.post('/', upload.single('image'), async (req, res) => {
   try {
-    console.log('Solicitud para crear un nuevo usuario:', req.body);
-    const { username, email, password, firstName, lastName, address, phone } = req.body;
-    const image = req.file ? { data: req.file.buffer, contentType: req.file.mimetype } : null;
-    console.log('Datos de la imagen:', image);
-    const user = new User({ username, email, password, firstName, lastName, address, phone, image });
+    console.log('Request to create a new user:', req.body);
+    const { username, email, password, firstName, lastName, address, phone, semester, parallel, career, description } = req.body;
+    let image;
+    if (req.file) {
+      image = { data: req.file.buffer, contentType: req.file.mimetype };
+    } else {
+      const defaultImagePath = path.join(__dirname, '../assets/user-icon.png');
+      const defaultImage = fs.readFileSync(defaultImagePath);
+      image = { data: defaultImage, contentType: 'image/png' };
+    }
+    console.log('Image data:', image);
+    const user = new User({ username, email, password, firstName, lastName, address, phone, image, semester, parallel, career, description });
     await user.save();
-    console.log('Usuario creado exitosamente:', user);
-    res.status(201).send({ message: 'Usuario creado exitosamente' });
+    console.log('User created successfully:', user);
+    res.status(201).send({ message: 'User created successfully' });
   } catch (error) {
-    console.error('Error al crear el usuario:', error);
+    console.error('Error creating user:', error);
     res.status(400).send({ error: error.message });
   }
 });

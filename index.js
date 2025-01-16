@@ -10,15 +10,15 @@ const userRoutes = require("./routes/userRoutes");
 require('dotenv').config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Read the port from the .env file
 
 // Middleware
-app.use(morgan('combined')); // Registrar solicitudes HTTP
+app.use(morgan('combined')); // Log HTTP requests
 app.use(bodyParser.json({ limit: '10mb' }));
 
-// Configuración de CORS
+// CORS configuration
 const corsOptions = {
-  origin: '*', // Permitir todas las fuentes, puedes cambiar esto a una lista específica de dominios
+  origin: '*', // Allow all origins, you can change this to a specific list of domains
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false,
   optionsSuccessStatus: 204
@@ -44,7 +44,7 @@ const swaggerOptions = {
     info: {
       title: "Users API",
       version: "1.0.0",
-      description: "API para crear usuarios",
+      description: "API to create users",
     },
   },
   apis: ["./routes/*.js"],
@@ -58,8 +58,8 @@ app.use("/api/users", userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message); // Registrar el mensaje del error
-  console.error('Stack:', err.stack); // Registrar el stack trace del error
+  console.error('Error:', err.message); // Log the error message
+  console.error('Stack:', err.stack); // Log the error stack trace
   if (err.type === 'entity.parse.failed') {
     res.status(400).send({ error: 'Bad Request: Invalid JSON' });
   } else {

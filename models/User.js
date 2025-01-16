@@ -39,6 +39,22 @@ const userSchema = new mongoose.Schema({
   image: {
     data: Buffer,
     contentType: String
+  },
+  semester: {
+    type: String,
+    required: true
+  },
+  parallel: {
+    type: String,
+    required: true
+  },
+  career: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
   }
 });
 
