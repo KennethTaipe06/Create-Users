@@ -52,6 +52,9 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+// Importar y ejecutar el consumidor
+require('./consumers/consumers');
+
 // Routes
 app.use("/api/users", userRoutes);
 
