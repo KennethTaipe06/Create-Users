@@ -1,15 +1,11 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const User = require('../models/User');
+const cors = require('cors');
+const userController = require('../controllers/userController');
 
 const router = express.Router();
 
-// Multer configuration for in-memory file storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// Habilitar CORS
+router.use(cors());
 
 /**
  * @swagger
@@ -44,9 +40,6 @@ const upload = multer({ storage: storage });
  *           type: string
  *         phone:
  *           type: string
- *         image:
- *           type: string
- *           format: binary
  *         semester:
  *           type: string
  *         parallel:
@@ -66,7 +59,7 @@ const upload = multer({ storage: storage });
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -84,9 +77,6 @@ const upload = multer({ storage: storage });
  *                 type: string
  *               phone:
  *                 type: string
- *               image:
- *                 type: string
- *                 format: binary
  *               semester:
  *                 type: string
  *               parallel:
@@ -101,27 +91,6 @@ const upload = multer({ storage: storage });
  *       400:
  *         description: Bad request
  */
-router.post('/', upload.single('image'), async (req, res) => {
-  try {
-    console.log('Request to create a new user:', req.body);
-    const { username, email, password, firstName, lastName, address, phone, semester, parallel, career, description } = req.body;
-    let image;
-    if (req.file) {
-      image = { data: req.file.buffer, contentType: req.file.mimetype };
-    } else {
-      const defaultImagePath = path.join(__dirname, '../assets/user-icon.png');
-      const defaultImage = fs.readFileSync(defaultImagePath);
-      image = { data: defaultImage, contentType: 'image/png' };
-    }
-    console.log('Image data:', image);
-    const user = new User({ username, email, password, firstName, lastName, address, phone, image, semester, parallel, career, description });
-    await user.save();
-    console.log('User created successfully:', user);
-    res.status(201).send({ message: 'User created successfully' });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(400).send({ error: error.message });
-  }
-});
+router.post('/', userController.createUser);
 
 module.exports = router;
