@@ -52,8 +52,11 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Importar y ejecutar el consumidor
-require('./consumers/consumers');
+// Importar y ejecutar los consumidores
+require('./consumers/userDeleteConsumer');
+require('./consumers/userCreatedConsumer');
+require('./consumers/userEditConsumer');
+require('./consumers/passResetConsumer');
 
 // Routes
 app.use("/api/users", userRoutes);

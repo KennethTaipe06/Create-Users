@@ -1,10 +1,8 @@
 const { Kafka } = require('kafkajs');
 const crypto = require('crypto');
-const mongoose = require('mongoose');
 const User = require('../models/User');
 require('dotenv').config();
 
-// Configuración de Kafka
 const kafka = new Kafka({
   clientId: process.env.KAFKA_CLIENT_ID,
   brokers: [process.env.KAFKA_BROKER]
@@ -12,8 +10,8 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'user-service-group' });
 
 const algorithm = 'aes-256-cbc';
-const key = Buffer.from(process.env.ENCRYPTION_KEY, 'hex'); // Clave estática
-const iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex'); // IV estático
+const key = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+const iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex');
 
 const decrypt = (text) => {
   let iv = Buffer.from(text.iv, 'hex');

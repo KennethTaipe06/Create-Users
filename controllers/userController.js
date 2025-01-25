@@ -7,14 +7,9 @@ exports.createUser = async (req, res) => {
   try {
     await connectProducer();
     console.log('Request to create a new user:', req.body);
-    const { username, email, password, firstName, lastName, address, phone, semester, parallel, career, description } = req.body;
-
-    // Guardar la contraseña en texto plano
-    const user = new User({ username, email, password, firstName, lastName, address, phone, semester, parallel, career, description });
+    const user = new User(req.body);
     await user.save();
-    //console.log('User created successfully:', user);
 
-    // Enviar datos del usuario a Kafka
     await sendMessage(process.env.KAFKA_TOPIC, { id: user._id, ...user.toObject() });
 
     res.status(201).send({ message: 'User created successfully' });
