@@ -10,15 +10,13 @@ const userRoutes = require("./routes/userRoutes");
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000; // Read the port from the .env file
+const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(morgan('combined')); // Log HTTP requests
+app.use(morgan('combined'));
 app.use(bodyParser.json({ limit: '10mb' }));
 
-// CORS configuration
 const corsOptions = {
-  origin: '*', // Allow all origins, you can change this to a specific list of domains
+  origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false,
   optionsSuccessStatus: 204
@@ -27,7 +25,6 @@ app.use(cors(corsOptions));
 
 app.use(helmet());
 
-// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -36,7 +33,6 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
-// Swagger setup
 const swaggerOptions = {
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -58,13 +54,11 @@ require('./consumers/userCreatedConsumer');
 require('./consumers/userEditConsumer');
 require('./consumers/passResetConsumer');
 
-// Routes
 app.use("/api/users", userRoutes);
 
-// Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message); // Log the error message
-  console.error('Stack:', err.stack); // Log the error stack trace
+  console.error('Error:', err.message);
+  console.error('Stack:', err.stack);
   if (err.type === 'entity.parse.failed') {
     res.status(400).send({ error: 'Bad Request: Invalid JSON' });
   } else {

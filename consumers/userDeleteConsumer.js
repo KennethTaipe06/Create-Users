@@ -1,12 +1,8 @@
-const { Kafka } = require('kafkajs');
+const kafka = require('../config/kafkaConfig');
 const crypto = require('crypto');
 const User = require('../models/User');
 require('dotenv').config();
 
-const kafka = new Kafka({
-  clientId: process.env.KAFKA_CLIENT_ID,
-  brokers: [process.env.KAFKA_BROKER]
-});
 const consumer = kafka.consumer({ groupId: 'user-service-group' });
 
 const algorithm = 'aes-256-cbc';
