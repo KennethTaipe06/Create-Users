@@ -8,6 +8,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const userRoutes = require("./routes/userRoutes");
 require('dotenv').config();
+const deleteUserConsumer = require('./consumers/userDeleteConsumer');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -49,10 +50,6 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Importar y ejecutar los consumidores
-require('./consumers/userDeleteConsumer');
-require('./consumers/userCreatedConsumer');
-require('./consumers/userEditConsumer');
-require('./consumers/passResetConsumer');
 
 app.use("/api/users", userRoutes);
 
@@ -68,4 +65,5 @@ app.use((err, req, res, next) => {
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
+  deleteUserConsumer.run().catch(console.error);
 });

@@ -19,24 +19,36 @@ const decrypt = (text) => {
 };
 
 const run = async () => {
-  await consumer.connect();
-  await consumer.subscribe({ topic: process.env.KAFKA_TOPIC_DELETE, fromBeginning: true });
+  try {
+    await consumer.connect();
+    console.log('Kafka consumer connected');
+    await consumer.subscribe({ topic: process.env.KAFKA_TOPIC_DELETE, fromBeginning: true });
+    console.log('Subscribed to topic:', process.env.KAFKA_TOPIC_DELETE);
 
-  await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      console.log('Received message:', message.value.toString());
-      const encryptedMessage = JSON.parse(message.value.toString());
-      console.log('Encrypted message:', encryptedMessage);
-      const decryptedMessage = decrypt(encryptedMessage);
-      console.log('Decrypted message:', decryptedMessage);
-      const { id } = JSON.parse(decryptedMessage);
+    await consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        console.log('Received message:', message.value.toString());
+        const encryptedMessage = JSON.parse(message.value.toString());
+        console.log('Encrypted message:', encryptedMessage);
+        const decryptedMessage = decrypt(encryptedMessage);
+        console.log('Decrypted message:', decryptedMessage);
+        const { id } = JSON.parse(decryptedMessage);
 
-      console.log('User ID to delete:', id);
+        console.log('User ID to delete:', id);
 
-      await User.findByIdAndDelete(id);
-      console.log('User deleted successfully');
-    }
-  });
+        const user = await User.findByIdAndDelete(id);
+        if (user) {
+          console.log('User deleted successfully:', user);
+        } else {
+          console.log('User not found:', id);
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error in Kafka consumer:', error);
+  }
 };
 
 run().catch(console.error);
+
+module.exports = { run };
