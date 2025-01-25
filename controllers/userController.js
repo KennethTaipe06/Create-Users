@@ -9,8 +9,8 @@ exports.createUser = async (req, res) => {
     console.log('Request to create a new user:', req.body);
     const { username, email, password, firstName, lastName, address, phone, semester, parallel, career, description } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword, firstName, lastName, address, phone, semester, parallel, career, description });
+    // Guardar la contraseña en texto plano
+    const user = new User({ username, email, password, firstName, lastName, address, phone, semester, parallel, career, description });
     await user.save();
     console.log('User created successfully:', user);
 
