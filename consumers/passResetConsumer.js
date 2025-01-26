@@ -1,7 +1,7 @@
 const kafka = require('../config/kafkaConfig');
 require('dotenv').config();
 
-const consumer = kafka.consumer({ groupId: 'user-service-group' });
+const consumer = kafka.consumer({ groupId: 'create-service-group' });
 
 const run = async () => {
   await consumer.connect();

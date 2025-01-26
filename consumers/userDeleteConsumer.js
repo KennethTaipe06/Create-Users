@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 require('dotenv').config();
 
-const consumer = kafka.consumer({ groupId: 'user-service-group' });
+const consumer = kafka.consumer({ groupId: 'create-service-group' });
 
 const algorithm = 'aes-256-cbc';
 const key = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
@@ -28,7 +28,13 @@ const run = async () => {
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         console.log('Received message:', message.value.toString());
-        const encryptedMessage = JSON.parse(message.value.toString());
+        let encryptedMessage;
+        try {
+          encryptedMessage = JSON.parse(message.value.toString());
+        } catch (error) {
+          console.error('Error parsing message as JSON:', error);
+          return;
+        }
         console.log('Encrypted message:', encryptedMessage);
         const decryptedMessage = decrypt(encryptedMessage);
         console.log('Decrypted message:', decryptedMessage);
